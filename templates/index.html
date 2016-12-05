@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="red">
+
+    <!-- URL icon -->
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='img/icon.png') }}"/>
+    <link href="{{ url_for('static', filename='img/icon.png') }}" rel="icon" type="image/x-icon"/>
+    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='img/icon.png') }}">
+
+    <title>Casa</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="{{ url_for('static', filename='css/metisMenu.min.css') }}" rel="stylesheet">
+
+    <!-- Timeline CSS -->
+    <link href="{{ url_for('static', filename='css/timeline.css') }}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/startmin.css') }}" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="{{ url_for('static', filename='css/morris.css') }}" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        body {
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+<div id="wrapper">
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Rocafort 124!</a>
+        </div>
+    </nav>
+    <div class="container-fluid" style="margin-top: 65px;">
+        <div class="row">
+            <div class="col-lg-2 col-md-3">
+                <div id="calentador" class="panel panel-green">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i onclick="togglePower()" class="fa fa-power-off fa-4x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div id="current" class="huge">1234W</div>
+                                <div>Consumo Actual</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <span id="estado" class="pull-left">Prendido</span>
+                        <span class="pull-right">Calentador</span>
+
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+                <div id="barcelona" class="panel">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <img id="icon_bcn" src=""/>
+
+                                <div id="temp_bcn"></div>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div id="hora_bcn" class="huge"></div>
+                                <div>Barcelona</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="bogota" class="panel">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <img id="icon_bog" src=""/>
+
+                                <div id="temp_bog"></div>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div id="hora_bog" class="huge"></div>
+                                <div>Bogotá</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-10 col-md-9">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+<!-- Metis Menu Plugin JavaScript -->
+<script src="{{ url_for('static', filename='js/metisMenu.min.js') }}"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="{{ url_for('static', filename='js/startmin.js') }}"></script>
+
+<!-- WorldClock JavaScript -->
+<script src="{{ url_for('static', filename='js/worldclock.js') }}"></script>
+
+<script>
+
+    $(document).ready(function () {
+        startTime('hora_bcn', true, 1);
+        startTime('hora_bog', true, -5);
+        updateWeatherData();
+        updateData();
+    });
+
+    var t, $_calentador, prendido, t_weather;
+    t = setInterval(updateData, 5000);
+    t_weather = setInterval(updateWeatherData, 360000);
+    $_calentador = $("#calentador");
+
+    function updateData() {
+        $.getJSON("/data", function (json) {
+            var current = (json.emeter.get_realtime.power | 0).toString();
+            $("#current").html(current + 'W');
+            console.log(json.emeter.get_realtime.power);
+            if (json.system.get_sysinfo.relay_state == 1) {
+                prendido = true;
+                $("#estado").html('Prendido');
+                $_calentador.addClass('panel-green');
+                $_calentador.removeClass('panel-red');
+            } else {
+                prendido = false;
+                $("#estado").html('Apagado');
+                $_calentador.addClass('panel-red');
+                $_calentador.removeClass('panel-green');
+            }
+        });
+    }
+    function togglePower() {
+        if (prendido) {
+            $.get("calentador/off", function (data) {
+                prendido = false;
+                $("#estado").html('Apagado');
+                $_calentador.addClass('panel-red');
+                $_calentador.removeClass('panel-green');
+                $("#current").html('0W');
+                console.log(data);
+            });
+            clearInterval(t);
+            t = setInterval(updateData, 10000);
+        }
+        else {
+            $.get("calentador/on", function (data) {
+                prendido = true;
+                console.log(data);
+                $("#estado").html('Prendido');
+                $_calentador.addClass('panel-green');
+                $_calentador.removeClass('panel-red');
+            });
+            clearInterval(t);
+            t = setInterval(updateData, 5000);
+        }
+        setTimeout(updateData, 5000);
+    }
+    function updateWeatherData() {
+        $.getJSON("/weather/Barcelona", function (json) {
+            var temp = json.current.temp_c.toString();
+            $("#temp_bcn").html(temp + '&#8451;');
+            $('#icon_bcn').attr('src', json.current.condition.icon);
+            console.log(json);
+        });
+        $.getJSON("/weather/Bogota", function (json) {
+            var temp = json.current.temp_c.toString();
+            $("#temp_bog").html(temp + '&#8451;');
+            $('#icon_bog').attr('src', json.current.condition.icon);
+            console.log(json);
+        });
+    }
+</script>
+
+</body>
+
+</html>
