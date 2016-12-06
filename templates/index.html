@@ -112,6 +112,36 @@
                         </div>
                     </div>
                 </div>
+                <div id="sm" class="panel">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <img id="icon_sm" src=""/>
+
+                                <div id="temp_sm"></div>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div id="hora_sm" class="huge"></div>
+                                <div>Santa Marta</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="berlin" class="panel">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <img id="icon_berlin" src=""/>
+
+                                <div id="temp_berlin"></div>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div id="hora_berlin" class="huge"></div>
+                                <div>Bérlin</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-lg-10 col-md-9">
 
@@ -140,13 +170,15 @@
     $(document).ready(function () {
         startTime('hora_bcn', true, 1);
         startTime('hora_bog', true, -5);
+        startTime('hora_sm', true, -5);
+        startTime('hora_berlin', true, 1);
         updateWeatherData();
         updateData();
     });
 
     var t, $_calentador, prendido, t_weather;
     t = setInterval(updateData, 5000);
-    t_weather = setInterval(updateWeatherData, 360000);
+    t_weather = setInterval(updateWeatherData, 1800000);
     $_calentador = $("#calentador");
 
     function updateData() {
@@ -204,6 +236,18 @@
             var temp = json.current.temp_c.toString();
             $("#temp_bog").html(temp + '&#8451;');
             $('#icon_bog').attr('src', json.current.condition.icon);
+            console.log(json);
+        });
+        $.getJSON("/weather/Santa Marta", function (json) {
+            var temp = json.current.temp_c.toString();
+            $("#temp_sm").html(temp + '&#8451;');
+            $('#icon_sm').attr('src', json.current.condition.icon);
+            console.log(json);
+        });
+        $.getJSON("/weather/Berlin", function (json) {
+            var temp = json.current.temp_c.toString();
+            $("#temp_berlin").html(temp + '&#8451;');
+            $('#icon_berlin').attr('src', json.current.condition.icon);
             console.log(json);
         });
     }
