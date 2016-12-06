@@ -26,7 +26,7 @@ import utils
 
 version = 0.1
 
-DEBUG = True
+DEBUG = False
 
 SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 
